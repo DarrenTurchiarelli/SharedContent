@@ -11,7 +11,6 @@
 
     .NOTES
     Create a function app or runbook in Azure Automation to run this script.
-    
 #>
 
 #Create a list to store all results
@@ -26,7 +25,7 @@ foreach ($sub in $Subscriptions) {
     #Set the context so the script will be executed within each subscriptions scope
     Get-AzSubscription -SubscriptionName $sub.Name | Set-AzContext
 
-    #Validate that snapshots are older than 14 days. If this is true, the snapshot will be deleted
+    #Insert your code here for what you want run across every subscription 
     $RGs = Get-AzResourceGroup
 
     foreach ($RG in $RGs) {
@@ -38,13 +37,28 @@ foreach ($sub in $Subscriptions) {
             $Name = $Snapshot.Name
             $ResourceGroupName = $Snapshot.ResourceGroupName
 
-            #Only delete snapshots older than 14 days
-            if ($Snapshot.TimeCreated -lt (Get-Date).AddDays(-14)) {
-                $Result.Add($Snapshot)
-                Remove-AzSnapshot -ResourceGroupName $ResourceGroupName -SnapshotName $Name -Force
+            # If the snapshot was taken in the last 14 days do nothing 
+            if ($Snapshot.TimeCreated -gt (Get-Date).AddDays(-14)) {
+                $Result.Add([PSCustomObject]@{
+                    SubscriptionName = $sub.Name
+                    ResourceGroupName = $ResourceGroupName
+                    Name = $Name
+                    TimeCreated = $Snapshot.TimeCreated
+                    Status = "Skipped"
+                })
             }
-            #Write the output to screen
-            Write-Output "Deleted $Name - $ResourceGroupName"
+            #If snapshot is older than 14 days delete it
+            else {
+                Remove-AzSnapshot -ResourceGroupName $ResourceGroupName -SnapshotName $Name -Force
+                $Result.Add([PSCustomObject]@{
+                    SubscriptionName = $sub.Name
+                    ResourceGroupName = $ResourceGroupName
+                    Name = $Name
+                    TimeCreated = $Snapshot.TimeCreated
+                    Status = "Deleted"
+                })
+            }
+
         }
     }
 
