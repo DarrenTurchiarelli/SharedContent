@@ -26,7 +26,7 @@ foreach ($sub in $Subscriptions) {
     #Set the context so the script will be executed within each subscriptions scope
     Get-AzSubscription -SubscriptionName $sub.Name | Set-AzContext
 
-    #Insert your code here for what you want run across every subscription 
+    #Validate that snapshots are older than 14 days. If this is true, the snapshot will be deleted
     $RGs = Get-AzResourceGroup
 
     foreach ($RG in $RGs) {
@@ -43,7 +43,7 @@ foreach ($sub in $Subscriptions) {
                 $Result.Add($Snapshot)
                 Remove-AzSnapshot -ResourceGroupName $ResourceGroupName -SnapshotName $Name -Force
             }
-
+            #Write the output to screen
             Write-Output "Deleted $Name - $ResourceGroupName"
         }
     }
