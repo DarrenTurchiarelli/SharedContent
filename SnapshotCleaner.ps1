@@ -25,7 +25,7 @@ foreach ($sub in $Subscriptions) {
     #Set the context so the script will be executed within each subscriptions scope
     Get-AzSubscription -SubscriptionName $sub.Name | Set-AzContext
 
-    #Insert your code here for what you want run across every subscription 
+    # Enumerate each snapshot 
     $RGs = Get-AzResourceGroup
 
     foreach ($RG in $RGs) {
