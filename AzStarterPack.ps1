@@ -1,8 +1,10 @@
 <#
     .SYNOPSIS
     Deploy all base tools on a new workstation
+    
     .DESCRIPTION  
     This script will install all the required tools to get up and running as soon as possible without having to manually install the tools of the trade.
+   
     .LINK
      
     .NOTES
