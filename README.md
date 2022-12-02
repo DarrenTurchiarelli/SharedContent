@@ -1,6 +1,6 @@
 # SharedContent
 
-Assortment of scripts, queries, workbooks for public consumption 
+Assortment of scripts, queries and workbooks for public consumption 
 
 
 DISCLAIMER
