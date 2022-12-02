@@ -1,6 +1,6 @@
 <#
     .SYNOPSIS
-    Retrieve all snapshots and delete them if they are older than 14 days.
+    Retrieve all snapshots and delete them if they are older than (x) days. Current days are set to 14. 
 
     .DESCRIPTION  
     This script will retrieve all snapshots and delete them if they are older than 14 days. This is because the snapshots are not deleted automatically by the system.
