@@ -3,8 +3,8 @@
     Retrieve all snapshots and delete them if they are older than (x) days. Current days are set to 14. 
 
     .DESCRIPTION  
-    This script will retrieve all snapshots and delete them if they are older than 14 days. This is because the snapshots are not deleted automatically by the system.
-    Using this in a dev or test environment is recommended to keep the storage space under control as well as keep costs down.
+    This script will retrieve all snapshots and delete them if they are older than 14 days across all subscriptions in a tenant. This is because the snapshots are not deleted automatically by the system.
+    Using this in a dev or test environment is recommended to optimize operational hygine and keep costs down.
 
     .LINK
      https://learn.microsoft.com/en-us/azure/virtual-machines/snapshot-copy-managed-disk?tabs=portal
