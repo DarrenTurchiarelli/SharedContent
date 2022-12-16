@@ -38,8 +38,8 @@ foreach ($sub in $Subscriptions) {
             $Name = $Snapshot.Name
             $ResourceGroupName = $Snapshot.ResourceGroupName
 
-            # If the snapshot was taken in the last 14 days and has the tag "Environment = Development" skip
-            if ($Snapshot.TimeCreated -gt (Get-Date).AddDays(-14) {
+            # If the snapshot was taken in the last 14 days do nothing 
+            if ($Snapshot.TimeCreated -gt (Get-Date).AddDays(-14)) {
                 $Result.Add([PSCustomObject]@{
                     SubscriptionName = $sub.Name
                     ResourceGroupName = $ResourceGroupName
@@ -48,9 +48,8 @@ foreach ($sub in $Subscriptions) {
                     Status = "Skipped"
                 })
             }
-   
-            #Else snapshot is older than 14 days and has the tag "Environment = Development" delete it
-            elseif ($Snapshot.TimeCreated -lt (Get-Date).AddDays(-14) {
+            #If snapshot is older than 14 days delete it
+            else {
                 Remove-AzSnapshot -ResourceGroupName $ResourceGroupName -SnapshotName $Name -Force
                 $Result.Add([PSCustomObject]@{
                     SubscriptionName = $sub.Name
@@ -60,9 +59,11 @@ foreach ($sub in $Subscriptions) {
                     Status = "Deleted"
                 })
             }
+
         }
     }
 
     #Add the  results to resulting List
     $Result.Add($Obj)
 }
+$Result
