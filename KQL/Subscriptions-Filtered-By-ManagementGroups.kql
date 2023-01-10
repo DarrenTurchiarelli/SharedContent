@@ -1,0 +1,5 @@
+ResourceContainers
+| where type =~ 'microsoft.management/managementgroups'
+| project ManagementGroup = name
+| join kind=leftouter (resourcecontainers | where type=~ 'microsoft.resources/subscriptions'
+| extend  mgParent = properties.managementGroupAncestorsChain | project SubscriptionName=name, SubscriptionID=subscriptionId, ManagementGroup = tostring(mgParent[0].name)) on ManagementGroup
