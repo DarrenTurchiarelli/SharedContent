@@ -1,4 +1,0 @@
-Resources
-| project VirtualMachine = name, Location = location, type, AvailabilityZones = zones
-| where type =~ 'Microsoft.Compute/VirtualMachines' or type =~ 'Microsoft.Compute/VirtualMachineScaleSets' 
-| order by VirtualMachine desc
