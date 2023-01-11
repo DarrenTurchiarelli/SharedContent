@@ -38,7 +38,7 @@ foreach ($sub in $Subscriptions) {
             $ResourceGroupName = $Snapshot.ResourceGroupName
 
             # If the snapshot was taken in the last 14 days do nothing 
-            if ($Snapshot.TimeCreated -gt (Get-Date).AddDays(-14)) {
+            if ($Snapshot.TimeCreated -gt (Get-Date).AddDays(-0)) {
                 $Result.Add([PSCustomObject]@{
                     SubscriptionName = $sub.Name
                     ResourceGroupName = $ResourceGroupName

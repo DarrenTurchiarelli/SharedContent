@@ -1,0 +1,35 @@
+Perf
+| where ObjectName == "LogicalDisk" and CounterName == "% Free Space"
+| where InstanceName <> "_Total"
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName
+
+
+$Processor
+Perf
+| where ObjectName == "Processor" and CounterName == "% Processor Time"
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName
+
+#Memory
+Perf
+| where ObjectName == "Memory" and CounterName == "% Committed Bytes In Use"
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName
+
+#Network
+Perf
+| where ObjectName == "Network Interface"
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, InstanceName, 
+CounterName
+
+#Processor utilization per user:
+Perf
+| where ObjectName == "Process"
+| join
+(
+VMProcess
+| where UserName !contains "system" and UserName !contains "service"
+| extend InstanceName = ExecutableName
+| project TimeGenerated, InstanceName, Computer, UserName, UserDomain
+)
+on InstanceName
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), InstanceName, CounterName, 
+UserName, Computer

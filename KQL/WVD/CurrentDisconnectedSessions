@@ -1,0 +1,5 @@
+Perf
+| where ObjectName == "Terminal Services"
+| where CounterName == "Inactive Sessions"
+| summarize arg_max(TimeGenerated, *) by Computer
+| project Computer, CounterName, CounterValue

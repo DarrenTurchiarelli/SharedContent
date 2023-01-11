@@ -1,0 +1,5 @@
+Perf
+| where ObjectName == "PhysicalDisk" and CounterName == "Avg. Disk Bytes/Read" and InstanceName !contains 
+"Total"
+| parse InstanceName with * " " DriveLetter
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 10m), Computer, DriveLetter

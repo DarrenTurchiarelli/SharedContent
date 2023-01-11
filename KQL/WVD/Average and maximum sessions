@@ -1,0 +1,8 @@
+Perf
+| where ObjectName == "Terminal Services"
+| where CounterName == "Total Sessions"
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer
+Perf
+| where ObjectName == "Terminal Services"
+| where CounterName == "Total Sessions"
+| summarize AggregatedValue = max(CounterValue) by bin(TimeGenerated, 1h), Computer

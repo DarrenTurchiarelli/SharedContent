@@ -1,0 +1,3 @@
+Perf
+| where ObjectName contains "Terminal Services" and CounterName == "Total Sessions"
+| summarize TotalSessions = max(CounterValue) by bin(TimeGenerated, 1d), Computer

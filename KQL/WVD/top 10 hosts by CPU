@@ -1,0 +1,6 @@
+Perf
+| where ObjectName == "Processor" and CounterName == "% Processor Time"
+| summarize AggregatedValue = avg(CounterValue) by bin(TimeGenerated, 1h), Computer
+| where AggregatedValue > 80
+| order by AggregatedValue desc
+| take 10

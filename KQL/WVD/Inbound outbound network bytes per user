@@ -1,0 +1,9 @@
+VMConnection
+| join
+(
+VMProcess
+| where UserName !contains "system" and UserName !contains "service"
+| extend ProcessName = ExecutableName
+| project TimeGenerated, ProcessName, Computer, UserName, UserDomain
+)
+on ProcessName

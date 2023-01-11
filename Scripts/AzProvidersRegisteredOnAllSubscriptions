@@ -1,0 +1,29 @@
+#Get a list of all Subscriptions in a given Azure tenant
+#For each subscription get a list of registered resource providers 
+#Finally export the results to a CSV
+#Using MS Excel you can then add filters to narrow your scope 
+
+$ErrorActionPreference =  "Stop"  
+try  {  
+
+$resources = @()
+Get-AzSubscription | ForEach-Object {
+    $_ | Set-AzContext
+    $subscriptionName = $_.Name
+    $subscriptionId = $_.SubscriptionId
+    Get-AzResourceProvider | ForEach-Object {
+        $resources += [PSCustomObject]@{
+            SubscriptionName  = $subscriptionName
+            SubscriptionId    = $subscriptionId
+            RegistrationState = $_.RegistrationState
+            ProviderNamespace = $_.ProviderNamespace
+        }
+        
+    }
+}
+$resources | Export-csv c:\Temp\AZSubProviders.csv
+}
+
+catch  {  
+    Write-Host  "$($_.Exception.Message)"  -BackgroundColor  DarkRed  
+    }

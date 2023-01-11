@@ -1,0 +1,5 @@
+WVDErrors
+| summarize usercount = count(UserName) by CodeSymbolic, CorrelationId, TimeGenerated
+| project CodeSymbolic, usercount, CorrelationId, TimeGenerated
+| sort by usercount desc
+|render piechart

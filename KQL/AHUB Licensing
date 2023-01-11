@@ -1,0 +1,41 @@
+resources | where type =~ 'microsoft.compute/virtualmachines' 
+| join kind = leftouter (resourcecontainers | where type =~ 'microsoft.resources/subscriptions' 
+| project SubscriptionName = name, subscriptionId) on subscriptionId
+| extend virtualMachineResourceId = tolower(tostring(id))
+| extend VmSize = tostring(properties.hardwareProfile.vmSize)
+| extend Priority = tostring(properties.priority)
+| extend PowerState = tostring(properties.extended.instanceView.powerState.displayStatus)
+| extend VmLicenceType = iif(properties.licenseType in ("None",""), "PAYG", "AHUB")
+| extend LicenceType = properties.licenseType
+| extend OsType = properties.extended.instanceView.osName
+| extend OsVersion = properties.extended.instanceView.osVersion
+| extend OperatingSystem = properties.storageProfile.osDisk.osType
+| extend VmCount = 1
+| where PowerState =~ 'VM running'
+| join kind = leftouter(resources | where type =~ 'microsoft.sqlvirtualmachine/sqlvirtualmachines'
+    | extend SqlLicenceType = tostring(properties.sqlServerLicenseType)
+    | extend SqlEdition = tostring(properties.sqlImageSku)
+    | extend SqlManagement = tostring(properties.sqlManagement)
+    | extend virtualMachineResourceId = tolower(tostring(properties.virtualMachineResourceId))
+    | project virtualMachineResourceId, SqlLicenceType, SqlEdition, SqlManagement) on virtualMachineResourceId
+| project-away virtualMachineResourceId1
+| project id, name, type, SubscriptionId = subscriptionId, SubscriptionName, Region = location, 
+            ResourceGroup = resourceGroup, VirtualMachineSku = VmSize, PowerState, Priority, OperatingSystem, 
+            OsType, OsVersion, LicenceType, VmLicenceType, SqlLicenceType, SqlEdition, SqlManagement, VmCount
+| union (
+            resources | where type =~ 'microsoft.compute/virtualmachinescalesets'
+            | join kind = leftouter (resourcecontainers | where type =~ 'microsoft.resources/subscriptions' 
+            | project SubscriptionName = name, subscriptionId) on subscriptionId
+            | extend VirtualMachineSku = tostring(sku.name)
+            | extend VmCount = tolong(sku.capacity)
+            | extend LicenceType = properties.virtualMachineProfile.licenseType
+            | extend VmLicenceType = iif(properties.virtualMachineProfile.licenseType in ("None",""), "PAYG", "AHUB")
+            | extend OsType = properties.virtualMachineProfile.storageProfile.imageReference.offer
+            | extend OperatingSystem = properties.virtualMachineProfile.storageProfile.osDisk.osType
+            | extend OsVersion = properties.virtualMachineProfile.storageProfile.imageReference.sku
+            | extend PowerState = "VM running"
+            | where VmCount > 0
+            | project id, name, type, SubscriptionId = subscriptionId, SubscriptionName, Region = location, 
+                    ResourceGroup = resourceGroup, VirtualMachineSku, PowerState, Priority = 'Regular', 
+                    OperatingSystem, OsType, OsVersion, LicenceType, VmLicenceType, VmCount
+        )

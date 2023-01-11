@@ -1,0 +1,35 @@
+$AZVNETs = Get-AzVirtualNetwork
+
+       ForEach ($VNET in $AZVNETs) {
+
+             $AZSubnets = Get-AzVirtualNetwork -Name $VNET.Name | Get-AzVirtualNetworkSubnetConfig
+
+             ForEach ($Subnet in $AZSubnets) {
+
+                    $SubnetConfigured = $Subnet | Select-Object -ExpandProperty IpConfigurations
+                    $Mask = $Subnet.AddressPrefix
+                    $Mask = $Mask.substring($Mask.Length - 2,2)
+
+                    #Effective hosts availabe minus 3 which are required by Azure 
+                    switch ($Mask) {
+                           '29' { $AvailableAddresses = "3" }
+                           '28' { $AvailableAddresses = "11" }
+                           '27' { $AvailableAddresses = "27" }
+                           '26' { $AvailableAddresses = "59" }
+                           '25' { $AvailableAddresses = "123" }
+                           '24' { $AvailableAddresses = "251" }
+                           '23' { $AvailableAddresses = "507" }
+                           '22' { $AvailableAddresses = "1019" }
+                           '21' { $AvailableAddresses = "2043" }
+                           '20' { $AvailableAddresses = "4091" }
+                           '19' { $AvailableAddresses = "8187" }
+                           '18' { $AvailableAddresses = "16379" }
+                           '17' { $AvailableAddresses = "32763" }
+                           '16' { $AvailableAddresses = "65531" }
+                    }
+
+                    $Subnet | Select-Object @{Name="VNET";Expression={$VNET.Name}}, Name, AddressPrefix, `
+                           @{Name="IPsConfigured";Expression={$SubnetConfigured.Count}},  `
+                                  @{Name="IPsLeft";Expression={$AvailableAddresses - $SubnetConfigured.Count}} | Format-Table -Autosize
+             }
+       }
