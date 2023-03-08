@@ -23,7 +23,7 @@ for row in table.findAll('div', attrs = {'class':'column medium-6 end'}): #For e
 
 print(AzureProducts)
 
-
+#export table to csv in the same folder that the script is run from
 filename = 'Azure_Products.csv' 
 with open(filename, 'w', newline='') as f:
     w = csv.DictWriter(f,['Category','Service','Description','Link'])
