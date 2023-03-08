@@ -13,7 +13,6 @@ AzureProducts=[] #A list to store all the Azure Products
 
 table = soup.find('div', attrs = {'id':'products-list'}) #Locate the table containing the Azure Products
 
-
 for row in table.findAll('div', attrs = {'class':'column medium-9 large-10'}): #For each row in the table
         offer ={} #Create a dictionary to store the data for each row
         offer['Offer'] = row.h2.text #Extract the text from the h2 tag and store it in the Offer column
@@ -21,7 +20,6 @@ for row in table.findAll('div', attrs = {'class':'column medium-9 large-10'}): #
         AzureOffers.append(offer) #Append the dictionary to the AzureOffers list
         #print(row.h2.text)
      
-
 for row in table.findAll('div', attrs = {'class':'column medium-6 end'}): #For each row in the table
         
         product = {} #Create a dictionary to store the data for each row
