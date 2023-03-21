@@ -89,7 +89,7 @@ choco install kubernetes-cli
 #Kubectx power tools https://github.com/ahmetb/kubectx#installation 
 choco install kubens kubectx
 
-#ARMClient is a simple command line tool to invoke the Azure Resource Manager API.
+#ARMClient is a simple command line tool to invoke the Azure Resource Manager API.https://github.com/projectkudu/ARMClient
 choco install armclient --source=https://chocolatey.org/api/v2/
 
 #Postman
