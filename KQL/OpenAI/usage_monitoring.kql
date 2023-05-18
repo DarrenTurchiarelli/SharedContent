@@ -1,0 +1,14 @@
+ApiManagementGatewayLogs
+| where OperationId == 'completions_create'
+| extend modelkey = substring(parse_json(BackendResponseBody)['model'], 0, indexof(parse_json(BackendResponseBody)['model'], '-', 0, -1, 2))
+| extend model = tostring(parse_json(BackendResponseBody)['model'])
+| extend prompttokens = parse_json(parse_json(BackendResponseBody)['usage'])['prompt_tokens']
+| extend completiontokens = parse_json(parse_json(BackendResponseBody)['usage'])['completion_tokens']
+| extend totaltokens = parse_json(parse_json(BackendResponseBody)['usage'])['total_tokens']
+| extend ip = CallerIpAddress
+| summarize
+    sum(todecimal(prompttokens)),
+    sum(todecimal(completiontokens)),
+    sum(todecimal(totaltokens)),
+    avg(todecimal(totaltokens))
+    by ip, model
