@@ -1,0 +1,5 @@
+ApiManagementGatewayLogs
+| where OperationId == 'completions_create'
+| extend model = tostring(parse_json(BackendResponseBody)['model'])
+| extend prompttokens = parse_json(parse_json(BackendResponseBody)['usage'])['prompt_tokens']
+| extend prompttext = substring(parse_json(parse_json(BackendResponseBody)['choices'])[0], 0, 100)
