@@ -1,0 +1,6 @@
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayPerformanceLog"
+| summarize avg(throughput_d) by Resource, bin(TimeGenerated, 1m)
+| extend ThroughputMb = (avg_throughput_d/1000)/1000
+| project Resource, TimeGenerated, ThroughputMb
+| render timechart

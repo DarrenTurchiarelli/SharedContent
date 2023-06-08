@@ -1,0 +1,10 @@
+// This is a useful one to help identify where you need to the troubleshooting steps listed here: https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-troubleshooting-502.
+
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayAccessLog"
+| where httpStatus_d == 502
+| parse requestQuery_s with * "SERVER-ROUTED=" serverRouted "&" *
+| extend httpStatus = tostring(httpStatus_d)
+| summarize count() by serverRouted, bin(TimeGenerated, 5m)
+| render timechart
+ 
