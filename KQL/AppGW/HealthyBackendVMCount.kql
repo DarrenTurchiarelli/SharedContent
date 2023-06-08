@@ -1,0 +1,4 @@
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayPerformanceLog"
+| summarize max(healthyHostCount_d) by Resource, bin(TimeGenerated, 1m)
+| render timechart

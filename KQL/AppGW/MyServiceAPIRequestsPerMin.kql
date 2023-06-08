@@ -1,0 +1,9 @@
+// The intention here is that this shows the number of requests for some specific URI, maybe a critical service.
+// You should modify the clause where requestUri_s == “/” to the URI of the service/API you want to list.
+
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayAccessLog"
+| where requestUri_s == "/"
+| summarize count() by requestUri_s, bin(TimeGenerated, 1m)
+| render timechart
+ 

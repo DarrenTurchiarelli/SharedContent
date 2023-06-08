@@ -1,0 +1,5 @@
+Requests per Min by API
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayAccessLog"
+| summarize count() by requestUri_s, bin(TimeGenerated, 1m)
+| render timechart

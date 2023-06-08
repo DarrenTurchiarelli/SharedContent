@@ -1,0 +1,7 @@
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayAccessLog"
+| where httpStatus_d >= 400
+| summarize count(httpStatus_d) by httpStatus_d,requestUri_s, bin(TimeGenerated, 1h)
+| order by count_httpStatus_d desc
+| project httpStatus_d, requestUri_s, TimeGenerated, count_httpStatus_d
+ 

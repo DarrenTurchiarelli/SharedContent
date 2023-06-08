@@ -1,0 +1,8 @@
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayAccessLog"
+| where httpStatus_d < 400
+| parse requestQuery_s with * "SERVER-ROUTED=" serverRouted "&" *
+| extend httpStatus = tostring(httpStatus_d)
+| summarize count() by serverRouted, bin(TimeGenerated, 5m)
+| render timechart
+ 

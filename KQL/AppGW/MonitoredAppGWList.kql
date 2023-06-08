@@ -1,0 +1,3 @@
+AzureDiagnostics
+| where ResourceProvider == "microsoft.network" and Category == "ApplicationGatewayAccessLog"
+| distinct Resource, ResourceGroup
