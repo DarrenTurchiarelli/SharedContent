@@ -75,7 +75,7 @@
             "location": "Global",
             "dependsOn": [
               "[parameters('actionGroupName')]"
-             ],
+               ],
             "properties": {
                 "enabled": true,
                 "scopes": [
