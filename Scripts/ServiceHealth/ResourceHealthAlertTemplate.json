@@ -1,174 +1,173 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-    "actionGroupName": {
-      "type": "string",
-      "defaultValue":  "serviceHealthActionGroup",
-      "minLength": 1,
-      "metadata": {
-        "description": "Name for the Action group."
-      }
-    },
-    "actionGroupShortName": {
-      "type": "string",
-      "defaultValue": "serviceAG",
-      "minLength": 1,
-      "maxLength": 12,
-      "metadata": {
-        "description": "Short name for the Action group."
-      }
-    },
-    "emailAddress": {
-      "type": "string",
-      "metadata": {
-        "description": "Email address."
-      }
-    },
-    "activityLogAlertName": {
-      "type": "string",
-      "defaultValue": "serviceHealthAlert",
-      "minLength": 1,
-      "metadata": {
-        "description": "Name for the Activity log alert."
-      }
-    },
-    "rgName": {
-      "type": "string",
-      "defaultValue": "[resourceGroup().name]",
-      "minLength": 1,
-      "metadata": {
-        "description": "Resource Group Scope for the Activity Logs ."
-      }
-    },
-    "subName": {
-      "type": "string",
-      "defaultValue": "[subscription().subscriptionId]",
-      "minLength": 1,
-      "metadata": {
-        "description": "Resource Group Scope for the Activity Logs ."
-      }
-    }
-  },
-  "resources": [
-    {
-      "type": "Microsoft.Insights/actionGroups",
-      "apiVersion": "2019-06-01",
-      "name": "[parameters('actionGroupName')]",
-      "location": "Global",
-      "properties": {
-        "groupShortName": "[parameters('actionGroupShortName')]",
-        "enabled": true,
-        "emailReceivers": [
-          {
-            "name": "emailReceiver",
-            "emailAddress": "[parameters('emailAddress')]"
-          }
-        ]
-      }
-    },
-    "resources": [
-        {
-            "type": "Microsoft.Insights/activityLogAlerts",
-            "apiVersion": "2020-10-01",
-            "name": "[parameters('activityLogAlertName')]",
-            "location": "Global",
-            "dependsOn": [
-              "[parameters('actionGroupName')]"
-            ],
-            "properties": {
-                "enabled": true,
-                "scopes": [
-                    "[concat('/subscriptions/',uriComponent(parameters('subName')),'/resourcegroups/',uriComponent(parameters('rgName')))]"
-                ],
-                "condition": {
-                    "allOf": [
-                        {
-                            "field": "category",
-                            "equals": "ResourceHealth",
-                            "containsAny": null
-                        },
-                        {
-                            "anyOf": [
-                                {
-                                    "field": "properties.currentHealthStatus",
-                                    "equals": "Available",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "properties.currentHealthStatus",
-                                    "equals": "Unavailable",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "properties.currentHealthStatus",
-                                    "equals": "Degraded",
-                                    "containsAny": null
-                                }
-                            ]
-                        },
-                        {
-                            "anyOf": [
-                                {
-                                    "field": "properties.previousHealthStatus",
-                                    "equals": "Available",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "properties.previousHealthStatus",
-                                    "equals": "Unavailable",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "properties.previousHealthStatus",
-                                    "equals": "Degraded",
-                                    "containsAny": null
-                                }
-                            ]
-                        },
-                        {
-                            "anyOf": [
-                                {
-                                    "field": "properties.cause",
-                                    "equals": "PlatformInitiated",
-                                    "containsAny": null
-                                }
-                            ]
-                        },
-                        {
-                            "anyOf": [
-                                {
-                                    "field": "status",
-                                    "equals": "Active",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "status",
-                                    "equals": "Resolved",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "status",
-                                    "equals": "In Progress",
-                                    "containsAny": null
-                                },
-                                {
-                                    "field": "status",
-                                    "equals": "Updated",
-                                    "containsAny": null
-                                }
-                            ]
-                        }
-                    ]
-                },
-                "actions": {
-                    "actionGroups": [
-                        {
-                            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
-                        }
-                    ]
-                }
-            }
-        }
-    ]
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"actionGroupName": {
+			"type": "string",
+			"defaultValue": "serviceHealthActionGroup",
+			"minLength": 1,
+			"metadata": {
+				"description": "Name for the Action group."
+			}
+		},
+		"actionGroupShortName": {
+			"type": "string",
+			"defaultValue": "serviceAG",
+			"minLength": 1,
+			"maxLength": 12,
+			"metadata": {
+				"description": "Short name for the Action group."
+			}
+		},
+		"emailAddress": {
+			"type": "string",
+			"metadata": {
+				"description": "Email address."
+			}
+		},
+		"activityLogAlertName": {
+			"type": "string",
+			"defaultValue": "serviceHealthAlert",
+			"minLength": 1,
+			"metadata": {
+				"description": "Name for the Activity log alert."
+			}
+		},
+		"rgName": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().name]",
+			"minLength": 1,
+			"metadata": {
+				"description": "Resource Group Scope for the Activity Logs."
+			}
+		},
+		"subName": {
+			"type": "string",
+			"defaultValue": "[subscription().subscriptionId]",
+			"minLength": 1,
+			"metadata": {
+				"description": "Subscription Scope for the Activity Logs."
+			}
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Insights/actionGroups",
+			"apiVersion": "2019-06-01",
+			"name": "[parameters('actionGroupName')]",
+			"location": "Global",
+			"properties": {
+				"groupShortName": "[parameters('actionGroupShortName')]",
+				"enabled": true,
+				"emailReceivers": [
+					{
+						"name": "emailReceiver",
+						"emailAddress": "[parameters('emailAddress')]"
+					}
+				]
+			}
+		},
+		{
+			"type": "Microsoft.Insights/activityLogAlerts",
+			"apiVersion": "2020-10-01",
+			"name": "[parameters('activityLogAlertName')]",
+			"location": "Global",
+			"dependsOn": [
+				"[parameters('actionGroupName')]"
+			],
+			"properties": {
+				"enabled": true,
+				"scopes": [
+					"[concat('/subscriptions/', parameters('subName'), '/resourceGroups/', parameters('rgName'))]"
+				],
+				"condition": {
+					"allOf": [
+						{
+							"field": "category",
+							"equals": "ResourceHealth",
+							"containsAny": null
+						},
+						{
+							"anyOf": [
+								{
+									"field": "properties.currentHealthStatus",
+									"equals": "Available",
+									"containsAny": null
+								},
+								{
+									"field": "properties.currentHealthStatus",
+									"equals": "Unavailable",
+									"containsAny": null
+								},
+								{
+									"field": "properties.currentHealthStatus",
+									"equals": "Degraded",
+									"containsAny": null
+								}
+							]
+						},
+						{
+							"anyOf": [
+								{
+									"field": "properties.previousHealthStatus",
+									"equals": "Available",
+									"containsAny": null
+								},
+								{
+									"field": "properties.previousHealthStatus",
+									"equals": "Unavailable",
+									"containsAny": null
+								},
+								{
+									"field": "properties.previousHealthStatus",
+									"equals": "Degraded",
+									"containsAny": null
+								}
+							]
+						},
+						{
+							"anyOf": [
+								{
+									"field": "properties.cause",
+									"equals": "PlatformInitiated",
+									"containsAny": null
+								}
+							]
+						},
+						{
+							"anyOf": [
+								{
+									"field": "status",
+									"equals": "Active",
+									"containsAny": null
+								},
+								{
+									"field": "status",
+									"equals": "Resolved",
+									"containsAny": null
+								},
+								{
+									"field": "status",
+									"equals": "In Progress",
+									"containsAny": null
+								},
+								{
+									"field": "status",
+									"equals": "Updated",
+									"containsAny": null
+								}
+							]
+						}
+					]
+				},
+				"actions": {
+					"actionGroups": [
+						{
+							"actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
+						}
+					]
+				}
+			}
+		}
+	]
 }
