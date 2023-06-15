@@ -1,3 +1,8 @@
+# Create Azure Service Health Alerts for All Resource Groups - Microsoft Tech Community
+# https://techcommunity.microsoft.com/t5/core-infrastructure-and-security/create-azure-service-health-alerts-for-all-resource-groups/ba-p/3610252
+
+# This has been built with some modifications based on the original work authored by Werner Rall
+
 #Log in to Azure account
 # Connect-AzAccount
 
