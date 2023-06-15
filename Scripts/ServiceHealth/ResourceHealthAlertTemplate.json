@@ -70,13 +70,16 @@
     "resources": [
         {
             "type": "Microsoft.Insights/activityLogAlerts",
-            "apiVersion": "2017-04-01",
+            "apiVersion": "2020-10-01",
             "name": "[parameters('activityLogAlertName')]",
             "location": "Global",
+           "dependsOn": [
+             "[parameters('actionGroupName')]"
+             ],
             "properties": {
                 "enabled": true,
                 "scopes": [
-                    "[subscription().id]"
+                    "[concat('/subscriptions/',uriComponent(parameters('subName')),'/resourcegroups/',uriComponent(parameters('rgName')))]"
                 ],
                 "condition": {
                     "allOf": [
@@ -161,7 +164,7 @@
                 "actions": {
                     "actionGroups": [
                         {
-                            "actionGroupId": "[parameters('actionGroupResourceId')]"
+                            "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups', parameters('actionGroupName'))]"
                         }
                     ]
                 }
