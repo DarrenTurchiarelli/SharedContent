@@ -197,9 +197,37 @@
       "type": 12,
       "content": {
         "version": "NotebookGroup/1.0",
-        "groupType": "template",
-        "loadFromTemplateId": "community-Workbooks/Common/noSubscriptions",
-        "items": []
+        "groupType": "editable",
+        "items": [
+          {
+            "type": 1,
+            "content": {
+              "json": "## No Subscriptions are selected.\r\n\r\nSelect one or more subscriptions to get started. If no subscriptions appear, we could not find any {ResourceName} resources in your subscriptions and you may need to [update your default subscription filter](https://azure.microsoft.com/en-us/updates/updates-to-subscription-filtering/)."
+            },
+            "name": "No Subscription text"
+          },
+          {
+            "type": 12,
+            "content": {
+              "version": "NotebookGroup/1.0",
+              "groupType": "editable",
+              "items": [
+                {
+                  "type": 1,
+                  "content": {
+                    "json": "<img src=\"{ResourceImageUrl}\" alt=\"{ResourceName}\" width=\"100px\" height=\"100px\">"
+                  },
+                  "name": "text - 0"
+                }
+              ]
+            },
+            "conditionalVisibility": {
+              "parameterName": "ResourceImageUrl",
+              "comparison": "isNotEqualTo"
+            },
+            "name": "ResourceImageUrl"
+          }
+        ]
       },
       "conditionalVisibility": {
         "parameterName": "Subscription",
@@ -231,17 +259,299 @@
               "style": "tabs",
               "links": [
                 {
-                  "id": "4ef584c8-d107-4569-9979-40208519163c",
+                  "id": "bf4f92b5-5857-4aa8-866c-61b400773134",
+                  "cellValue": "selectedTab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Overview",
+                  "subTarget": "Overview"
+                },
+                {
+                  "id": "b915717d-4d5f-4891-925e-27eaacbb52d6",
                   "cellValue": "selectedTab",
                   "linkTarget": "parameter",
                   "linkLabel": "Capacity",
                   "subTarget": "Capacity"
+                },
+                {
+                  "id": "5d0f1075-fc0d-4967-9c41-19707207cddd",
+                  "cellValue": "selectedTab",
+                  "linkTarget": "parameter",
+                  "linkLabel": "Security",
+                  "subTarget": "Security",
+                  "style": "link"
                 }
               ]
             },
             "name": "Navigation links",
             "styleSettings": {
               "margin": "10px 0 0 0"
+            }
+          },
+          {
+            "type": 1,
+            "content": {
+              "json": "### Overview section"
+            },
+            "conditionalVisibility": {
+              "parameterName": "1",
+              "comparison": "isEqualTo",
+              "value": "2"
+            },
+            "name": "text - 4"
+          },
+          {
+            "type": 10,
+            "content": {
+              "chartId": "workbookdb19a8d8-91af-44ea-951d-5ffa133b2ebe",
+              "version": "MetricsItem/2.0",
+              "size": 2,
+              "chartType": 0,
+              "resourceType": "microsoft.storage/storageaccounts",
+              "metricScope": 0,
+              "resourceParameter": "Resources",
+              "resourceIds": [
+                "{Resources}"
+              ],
+              "timeContextFromParameter": "TimeRange",
+              "timeContext": {
+                "durationMs": 14400000
+              },
+              "metrics": [
+                {
+                  "namespace": "microsoft.storage/storageaccounts",
+                  "metric": "microsoft.storage/storageaccounts-Transaction-Transactions",
+                  "aggregation": 1
+                },
+                {
+                  "namespace": "microsoft.storage/storageaccounts",
+                  "metric": "microsoft.storage/storageaccounts-Transaction-SuccessE2ELatency",
+                  "aggregation": 4
+                },
+                {
+                  "namespace": "microsoft.storage/storageaccounts",
+                  "metric": "microsoft.storage/storageaccounts-Transaction-SuccessServerLatency",
+                  "aggregation": 4
+                },
+                {
+                  "namespace": "microsoft.storage/storageaccounts",
+                  "metric": "microsoft.storage/storageaccounts-Transaction-Transactions",
+                  "aggregation": 1,
+                  "splitBy": "ResponseType",
+                  "splitBySortOrder": -1,
+                  "splitByLimit": 4,
+                  "columnName": "Errors"
+                }
+              ],
+              "resourceLimit": 200,
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "$gen_group",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "subTarget": "insights",
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "Subscription",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "Name",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "microsoft.storage/storageaccounts-Transaction-Transactions$|Transactions$",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue",
+                      "showIcon": true,
+                      "aggregation": "Sum"
+                    },
+                    "numberFormat": {
+                      "unit": 17,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 1
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "microsoft.storage/storageaccounts-Transaction-Transactions Timeline$|Transactions Timeline$",
+                    "formatter": 21,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue",
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "microsoft.storage/storageaccounts-Transaction-SuccessE2ELatency$|microsoft.storage/storageaccounts-Transaction-SuccessServerLatency$|E2E Latency$|Server Latency$",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue",
+                      "linkTarget": "WorkbookTemplate",
+                      "showIcon": true,
+                      "workbookContext": {
+                        "componentIdSource": "column",
+                        "componentId": "Name",
+                        "resourceIdsSource": "column",
+                        "resourceIds": "Name",
+                        "templateIdSource": "static",
+                        "templateId": "Community-Workbooks/Individual Storage/Performance",
+                        "typeSource": "static",
+                        "type": "workbook",
+                        "gallerySource": "static",
+                        "gallery": "microsoft.storage/storageaccounts"
+                      }
+                    },
+                    "numberFormat": {
+                      "unit": 23,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 2
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "microsoft.storage/storageaccounts-Transaction-SuccessE2ELatency Timeline$|E2E Latency Timeline$",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "microsoft.storage/storageaccounts-Transaction-SuccessServerLatency Timeline",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "Success/Errors",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "success/Errors",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": ".*\\/Errors",
+                    "formatter": 8,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "gray",
+                      "linkTarget": "WorkbookTemplate",
+                      "showIcon": true,
+                      "workbookContext": {
+                        "componentIdSource": "column",
+                        "componentId": "Name",
+                        "resourceIdsSource": "column",
+                        "resourceIds": "Name",
+                        "templateIdSource": "static",
+                        "templateId": "Community-Workbooks/Individual Storage/Failures",
+                        "typeSource": "static",
+                        "type": "workbook",
+                        "gallerySource": "static",
+                        "gallery": "microsoft.storage/storageaccounts"
+                      }
+                    },
+                    "numberFormat": {
+                      "unit": 17,
+                      "options": {
+                        "style": "decimal",
+                        "maximumFractionDigits": 1
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Server Latency Timeline",
+                    "formatter": 5,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  }
+                ],
+                "rowLimit": 10000,
+                "filter": true,
+                "hierarchySettings": {
+                  "treeType": 1,
+                  "groupBy": [
+                    "Subscription"
+                  ],
+                  "expandTopLevel": true,
+                  "finalBy": "Name"
+                },
+                "sortBy": [
+                  {
+                    "itemKey": "$gen_heatmap_microsoft.storage/storageaccounts-Transaction-Transactions$|Transactions$_3",
+                    "sortOrder": 2
+                  }
+                ],
+                "labelSettings": [
+                  {
+                    "columnId": "Subscription",
+                    "label": "Subscription"
+                  },
+                  {
+                    "columnId": "microsoft.storage/storageaccounts-Transaction-Transactions",
+                    "label": "Transactions"
+                  },
+                  {
+                    "columnId": "microsoft.storage/storageaccounts-Transaction-Transactions Timeline",
+                    "label": "Transactions Timeline"
+                  },
+                  {
+                    "columnId": "microsoft.storage/storageaccounts-Transaction-SuccessE2ELatency",
+                    "label": "E2E Latency"
+                  },
+                  {
+                    "columnId": "microsoft.storage/storageaccounts-Transaction-SuccessE2ELatency Timeline",
+                    "label": "E2E Latency Timeline"
+                  },
+                  {
+                    "columnId": "microsoft.storage/storageaccounts-Transaction-SuccessServerLatency",
+                    "label": "Server Latency"
+                  },
+                  {
+                    "columnId": "microsoft.storage/storageaccounts-Transaction-SuccessServerLatency Timeline",
+                    "label": "Server Latency Timeline"
+                  }
+                ]
+              },
+              "sortBy": [
+                {
+                  "itemKey": "$gen_heatmap_microsoft.storage/storageaccounts-Transaction-Transactions$|Transactions$_3",
+                  "sortOrder": 2
+                }
+              ],
+              "showExportToExcel": true
+            },
+            "conditionalVisibility": {
+              "parameterName": "selectedTab",
+              "comparison": "isEqualTo",
+              "value": "Overview"
+            },
+            "showPin": true,
+            "name": "storage account metrics",
+            "styleSettings": {
+              "margin": "0 10px 0 10px"
             }
           },
           {
@@ -487,15 +797,273 @@
       "type": 3,
       "content": {
         "version": "KqlItem/1.0",
-        "query": "",
+        "query": "Resources\r\n| where type =~ 'microsoft.storage/storageaccounts'\r\n| extend\r\n\tResource_name = id,\r\n\tHTTPS_Only = properties.supportsHttpsTrafficOnly,\r\n\tAnonymous_Access = properties.allowBlobPublicAccess,\r\n\tInternet_Access = properties.networkAcls.defaultAction,\r\n\tNetwork_Policy = properties.networkAcls.ipRules,\r\n    Subscription = subscriptionId,\r\n    Minimum_TLS_Version = properties.minimumTlsVersion\r\n\r\n| join kind=inner (\r\n\tResourceContainers\r\n\t| where type =~ 'microsoft.resources/subscriptions/resourcegroups'\r\n\t| extend\r\n\t\tResource_Group = id\r\n\t| project subscriptionId, resourceGroup,Resource_Group)\r\non subscriptionId, resourceGroup\r\n| join kind=inner (\r\n\tSecurityResources\r\n    | where type == 'microsoft.security/assessments'\r\n    | where properties.displayName == 'Microsoft Defender for Storage should be enabled'\r\n    | extend \r\n        subscriptionId = substring(properties.resourceDetails.Id, 15),\r\n        Defender_Status = properties.status.code\r\n    | project subscriptionId,Defender_Status)\r\non subscriptionId\r\n| project Resource_name,Anonymous_Access,Internet_Access,HTTPS_Only,Minimum_TLS_Version,Defender_Status,type,Resource_Group,Subscription,Network_Policy",
         "size": 0,
-        "timeContext": {
-          "durationMs": 86400000
+        "title": "Security Configuration | Storage Accounts",
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 1,
+        "resourceType": "microsoft.resourcegraph/resources",
+        "crossComponentResources": [
+          "{Resources}"
+        ],
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Resource_name",
+              "formatter": 13,
+              "formatOptions": {
+                "linkTarget": "Resource",
+                "linkIsContextBlade": true,
+                "showIcon": true,
+                "bladeOpenContext": {
+                  "bladeParameters": []
+                }
+              }
+            },
+            {
+              "columnMatch": "Anonymous_Access",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "false",
+                    "representation": "success",
+                    "text": "Healthy"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "true",
+                    "representation": "4",
+                    "text": "Unhealthy"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1}"
+                  }
+                ]
+              },
+              "tooltipFormat": {
+                "tooltip": "Storage Account -> Settings -> Configuration -> Allow Blob Public Access -> Disabled"
+              }
+            },
+            {
+              "columnMatch": "Internet_Access",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Allow",
+                    "representation": "4",
+                    "text": "Bad"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Deny",
+                    "representation": "success",
+                    "text": "Good"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1}"
+                  }
+                ]
+              },
+              "tooltipFormat": {
+                "tooltip": "Storage Account -> Security & Networking -> Networking ->  Public network access -> Enabled from selected virtual networks and IP addresses OR Disabled"
+              }
+            },
+            {
+              "columnMatch": "HTTPS_Only",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "true",
+                    "representation": "success",
+                    "text": "Good"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "false",
+                    "representation": "4",
+                    "text": "Bad"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1}"
+                  }
+                ]
+              },
+              "tooltipFormat": {
+                "tooltip": "Storage Account -> Settings -> Configuration -> Secure transfer required -> Enabled"
+              }
+            },
+            {
+              "columnMatch": "Minimum_TLS_Version",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "TLS1_2",
+                    "representation": "success",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "TLS1_1",
+                    "representation": "4",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "TLS1_0",
+                    "representation": "4",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "TLS1_3",
+                    "representation": "success",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": ""
+                  }
+                ]
+              },
+              "tooltipFormat": {
+                "tooltip": " torage Account -> Settings -> Configuration -> Minimum TLS Version -> TLS1.2"
+              }
+            },
+            {
+              "columnMatch": "Defender_Status",
+              "formatter": 18,
+              "formatOptions": {
+                "thresholdsOptions": "icons",
+                "thresholdsGrid": [
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Healthy",
+                    "representation": "success",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "Unhealthy",
+                    "representation": "4",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "==",
+                    "thresholdValue": "NotApplicable",
+                    "representation": "1",
+                    "text": "{0}{1}"
+                  },
+                  {
+                    "operator": "Default",
+                    "thresholdValue": null,
+                    "representation": "1",
+                    "text": "{0}{1}"
+                  }
+                ]
+              }
+            },
+            {
+              "columnMatch": "type",
+              "formatter": 16,
+              "formatOptions": {
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Resource_Group",
+              "formatter": 14,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true
+              }
+            },
+            {
+              "columnMatch": "Subscription",
+              "formatter": 15,
+              "formatOptions": {
+                "linkTarget": null,
+                "showIcon": true
+              }
+            }
+          ],
+          "filter": true,
+          "labelSettings": [
+            {
+              "columnId": "Resource_name",
+              "label": "Resource Name"
+            },
+            {
+              "columnId": "Anonymous_Access",
+              "label": "Anonymous Access"
+            },
+            {
+              "columnId": "Internet_Access",
+              "label": "Internet Access"
+            },
+            {
+              "columnId": "HTTPS_Only",
+              "label": "HTTPS Only"
+            },
+            {
+              "columnId": "Minimum_TLS_Version",
+              "label": "Minimum TLS Version"
+            },
+            {
+              "columnId": "Defender_Status",
+              "label": "Defender Status"
+            },
+            {
+              "columnId": "type",
+              "label": "Type"
+            },
+            {
+              "columnId": "Resource_Group",
+              "label": "Resource Group"
+            },
+            {
+              "columnId": "Subscription",
+              "label": "Subscription"
+            },
+            {
+              "columnId": "Network_Policy",
+              "label": "Network Policy"
+            }
+          ]
         },
-        "queryType": 0,
-        "resourceType": "microsoft.operationalinsights/workspaces"
+        "tileSettings": {
+          "showBorder": true
+        }
       },
-      "name": "query - 3"
+      "conditionalVisibility": {
+        "parameterName": "Subscription",
+        "comparison": "isNotEqualTo",
+        "value": ""
+      },
+      "name": "Security"
     }
   ],
   "fallbackResourceIds": [
