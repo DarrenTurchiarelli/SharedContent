@@ -314,7 +314,7 @@
               ],
               "timeContextFromParameter": "TimeRange",
               "timeContext": {
-                "durationMs": 14400000
+                "durationMs": 604800000
               },
               "metrics": [
                 {
@@ -581,7 +581,7 @@
               ],
               "timeContextFromParameter": "TimeRange",
               "timeContext": {
-                "durationMs": 14400000
+                "durationMs": 604800000
               },
               "metrics": [
                 {
@@ -783,6 +783,278 @@
             "styleSettings": {
               "margin": "0 10px 0 10px"
             }
+          },
+          {
+            "type": 3,
+            "content": {
+              "version": "KqlItem/1.0",
+              "query": "Resources\r\n| where type =~ 'microsoft.storage/storageaccounts'\r\n| extend\r\n\tResource_name = id,\r\n\tHTTPS_Only = properties.supportsHttpsTrafficOnly,\r\n\tAnonymous_Access = properties.allowBlobPublicAccess,\r\n\tInternet_Access = properties.networkAcls.defaultAction,\r\n\tNetwork_Policy = properties.networkAcls.ipRules,\r\n    Subscription = subscriptionId,\r\n    Minimum_TLS_Version = properties.minimumTlsVersion\r\n\r\n| join kind=inner (\r\n\tResourceContainers\r\n\t| where type =~ 'microsoft.resources/subscriptions/resourcegroups'\r\n\t| extend\r\n\t\tResource_Group = id\r\n\t| project subscriptionId, resourceGroup,Resource_Group)\r\non subscriptionId, resourceGroup\r\n| join kind=inner (\r\n\tSecurityResources\r\n    | where type == 'microsoft.security/assessments'\r\n    | where properties.displayName == 'Microsoft Defender for Storage should be enabled'\r\n    | extend \r\n        subscriptionId = substring(properties.resourceDetails.Id, 15),\r\n        Defender_Status = properties.status.code\r\n    | project subscriptionId,Defender_Status)\r\non subscriptionId\r\n| project Resource_name,Anonymous_Access,Internet_Access,HTTPS_Only,Minimum_TLS_Version,Defender_Status,type,Resource_Group,Subscription,Network_Policy",
+              "size": 0,
+              "title": "Security Configuration | Storage Accounts",
+              "showRefreshButton": true,
+              "showExportToExcel": true,
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources",
+              "crossComponentResources": [
+                "{Resources}"
+              ],
+              "gridSettings": {
+                "formatters": [
+                  {
+                    "columnMatch": "Resource_name",
+                    "formatter": 13,
+                    "formatOptions": {
+                      "linkTarget": "Resource",
+                      "linkIsContextBlade": true,
+                      "showIcon": true,
+                      "bladeOpenContext": {
+                        "bladeParameters": []
+                      }
+                    }
+                  },
+                  {
+                    "columnMatch": "Anonymous_Access",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "false",
+                          "representation": "success",
+                          "text": "Healthy"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "true",
+                          "representation": "4",
+                          "text": "Unhealthy"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Storage Account -> Settings -> Configuration -> Allow Blob Public Access -> Disabled"
+                    }
+                  },
+                  {
+                    "columnMatch": "Internet_Access",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Allow",
+                          "representation": "4",
+                          "text": "Bad"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Deny",
+                          "representation": "success",
+                          "text": "Good"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Storage Account -> Security & Networking -> Networking ->  Public network access -> Enabled from selected virtual networks and IP addresses OR Disabled"
+                    }
+                  },
+                  {
+                    "columnMatch": "HTTPS_Only",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "true",
+                          "representation": "success",
+                          "text": "Good"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "false",
+                          "representation": "4",
+                          "text": "Bad"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Storage Account -> Settings -> Configuration -> Secure transfer required -> Enabled"
+                    }
+                  },
+                  {
+                    "columnMatch": "Minimum_TLS_Version",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "TLS1_2",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "TLS1_1",
+                          "representation": "4",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "TLS1_0",
+                          "representation": "4",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "TLS1_3",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": ""
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": " torage Account -> Settings -> Configuration -> Minimum TLS Version -> TLS1.2"
+                    }
+                  },
+                  {
+                    "columnMatch": "Defender_Status",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Healthy",
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "Unhealthy",
+                          "representation": "4",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "NotApplicable",
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "columnMatch": "type",
+                    "formatter": 16,
+                    "formatOptions": {
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "Resource_Group",
+                    "formatter": 14,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  },
+                  {
+                    "columnMatch": "Subscription",
+                    "formatter": 15,
+                    "formatOptions": {
+                      "linkTarget": null,
+                      "showIcon": true
+                    }
+                  }
+                ],
+                "filter": true,
+                "labelSettings": [
+                  {
+                    "columnId": "Resource_name",
+                    "label": "Resource Name"
+                  },
+                  {
+                    "columnId": "Anonymous_Access",
+                    "label": "Anonymous Access"
+                  },
+                  {
+                    "columnId": "Internet_Access",
+                    "label": "Internet Access"
+                  },
+                  {
+                    "columnId": "HTTPS_Only",
+                    "label": "HTTPS Only"
+                  },
+                  {
+                    "columnId": "Minimum_TLS_Version",
+                    "label": "Minimum TLS Version"
+                  },
+                  {
+                    "columnId": "Defender_Status",
+                    "label": "Defender Status"
+                  },
+                  {
+                    "columnId": "type",
+                    "label": "Type"
+                  },
+                  {
+                    "columnId": "Resource_Group",
+                    "label": "Resource Group"
+                  },
+                  {
+                    "columnId": "Subscription",
+                    "label": "Subscription"
+                  },
+                  {
+                    "columnId": "Network_Policy",
+                    "label": "Network Policy"
+                  }
+                ]
+              },
+              "tileSettings": {
+                "showBorder": true
+              }
+            },
+            "conditionalVisibility": {
+              "parameterName": "selectedTab",
+              "comparison": "isEqualTo",
+              "value": "Security"
+            },
+            "name": "Security"
           }
         ]
       },
@@ -792,278 +1064,6 @@
         "value": ""
       },
       "name": "Storage accounts"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "Resources\r\n| where type =~ 'microsoft.storage/storageaccounts'\r\n| extend\r\n\tResource_name = id,\r\n\tHTTPS_Only = properties.supportsHttpsTrafficOnly,\r\n\tAnonymous_Access = properties.allowBlobPublicAccess,\r\n\tInternet_Access = properties.networkAcls.defaultAction,\r\n\tNetwork_Policy = properties.networkAcls.ipRules,\r\n    Subscription = subscriptionId,\r\n    Minimum_TLS_Version = properties.minimumTlsVersion\r\n\r\n| join kind=inner (\r\n\tResourceContainers\r\n\t| where type =~ 'microsoft.resources/subscriptions/resourcegroups'\r\n\t| extend\r\n\t\tResource_Group = id\r\n\t| project subscriptionId, resourceGroup,Resource_Group)\r\non subscriptionId, resourceGroup\r\n| join kind=inner (\r\n\tSecurityResources\r\n    | where type == 'microsoft.security/assessments'\r\n    | where properties.displayName == 'Microsoft Defender for Storage should be enabled'\r\n    | extend \r\n        subscriptionId = substring(properties.resourceDetails.Id, 15),\r\n        Defender_Status = properties.status.code\r\n    | project subscriptionId,Defender_Status)\r\non subscriptionId\r\n| project Resource_name,Anonymous_Access,Internet_Access,HTTPS_Only,Minimum_TLS_Version,Defender_Status,type,Resource_Group,Subscription,Network_Policy",
-        "size": 0,
-        "title": "Security Configuration | Storage Accounts",
-        "showRefreshButton": true,
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "{Resources}"
-        ],
-        "gridSettings": {
-          "formatters": [
-            {
-              "columnMatch": "Resource_name",
-              "formatter": 13,
-              "formatOptions": {
-                "linkTarget": "Resource",
-                "linkIsContextBlade": true,
-                "showIcon": true,
-                "bladeOpenContext": {
-                  "bladeParameters": []
-                }
-              }
-            },
-            {
-              "columnMatch": "Anonymous_Access",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "false",
-                    "representation": "success",
-                    "text": "Healthy"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "true",
-                    "representation": "4",
-                    "text": "Unhealthy"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "1",
-                    "text": "{0}{1}"
-                  }
-                ]
-              },
-              "tooltipFormat": {
-                "tooltip": "Storage Account -> Settings -> Configuration -> Allow Blob Public Access -> Disabled"
-              }
-            },
-            {
-              "columnMatch": "Internet_Access",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Allow",
-                    "representation": "4",
-                    "text": "Bad"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Deny",
-                    "representation": "success",
-                    "text": "Good"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "1",
-                    "text": "{0}{1}"
-                  }
-                ]
-              },
-              "tooltipFormat": {
-                "tooltip": "Storage Account -> Security & Networking -> Networking ->  Public network access -> Enabled from selected virtual networks and IP addresses OR Disabled"
-              }
-            },
-            {
-              "columnMatch": "HTTPS_Only",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "true",
-                    "representation": "success",
-                    "text": "Good"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "false",
-                    "representation": "4",
-                    "text": "Bad"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "1",
-                    "text": "{0}{1}"
-                  }
-                ]
-              },
-              "tooltipFormat": {
-                "tooltip": "Storage Account -> Settings -> Configuration -> Secure transfer required -> Enabled"
-              }
-            },
-            {
-              "columnMatch": "Minimum_TLS_Version",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "TLS1_2",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "TLS1_1",
-                    "representation": "4",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "TLS1_0",
-                    "representation": "4",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "TLS1_3",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "1",
-                    "text": ""
-                  }
-                ]
-              },
-              "tooltipFormat": {
-                "tooltip": " torage Account -> Settings -> Configuration -> Minimum TLS Version -> TLS1.2"
-              }
-            },
-            {
-              "columnMatch": "Defender_Status",
-              "formatter": 18,
-              "formatOptions": {
-                "thresholdsOptions": "icons",
-                "thresholdsGrid": [
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Healthy",
-                    "representation": "success",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "Unhealthy",
-                    "representation": "4",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "==",
-                    "thresholdValue": "NotApplicable",
-                    "representation": "1",
-                    "text": "{0}{1}"
-                  },
-                  {
-                    "operator": "Default",
-                    "thresholdValue": null,
-                    "representation": "1",
-                    "text": "{0}{1}"
-                  }
-                ]
-              }
-            },
-            {
-              "columnMatch": "type",
-              "formatter": 16,
-              "formatOptions": {
-                "showIcon": true
-              }
-            },
-            {
-              "columnMatch": "Resource_Group",
-              "formatter": 14,
-              "formatOptions": {
-                "linkTarget": null,
-                "showIcon": true
-              }
-            },
-            {
-              "columnMatch": "Subscription",
-              "formatter": 15,
-              "formatOptions": {
-                "linkTarget": null,
-                "showIcon": true
-              }
-            }
-          ],
-          "filter": true,
-          "labelSettings": [
-            {
-              "columnId": "Resource_name",
-              "label": "Resource Name"
-            },
-            {
-              "columnId": "Anonymous_Access",
-              "label": "Anonymous Access"
-            },
-            {
-              "columnId": "Internet_Access",
-              "label": "Internet Access"
-            },
-            {
-              "columnId": "HTTPS_Only",
-              "label": "HTTPS Only"
-            },
-            {
-              "columnId": "Minimum_TLS_Version",
-              "label": "Minimum TLS Version"
-            },
-            {
-              "columnId": "Defender_Status",
-              "label": "Defender Status"
-            },
-            {
-              "columnId": "type",
-              "label": "Type"
-            },
-            {
-              "columnId": "Resource_Group",
-              "label": "Resource Group"
-            },
-            {
-              "columnId": "Subscription",
-              "label": "Subscription"
-            },
-            {
-              "columnId": "Network_Policy",
-              "label": "Network Policy"
-            }
-          ]
-        },
-        "tileSettings": {
-          "showBorder": true
-        }
-      },
-      "conditionalVisibility": {
-        "parameterName": "Subscription",
-        "comparison": "isNotEqualTo",
-        "value": ""
-      },
-      "name": "Security"
     }
   ],
   "fallbackResourceIds": [
