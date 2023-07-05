@@ -581,7 +581,7 @@
               ],
               "timeContextFromParameter": "TimeRange",
               "timeContext": {
-                "durationMs": 0
+                "durationMs": 604800000
               },
               "metrics": [
                 {
@@ -788,7 +788,7 @@
             "type": 3,
             "content": {
               "version": "KqlItem/1.0",
-              "query": "Resources\r\n| where type =~ 'microsoft.storage/storageaccounts'\r\n| extend\r\n\tResource_name = id,\r\n\tHTTPS_Only = properties.supportsHttpsTrafficOnly,\r\n\tAnonymous_Access = properties.allowBlobPublicAccess,\r\n\tInternet_Access = properties.networkAcls.defaultAction,\r\n\tNetwork_Policy = properties.networkAcls.ipRules,\r\n    Subscription = subscriptionId,\r\n    Minimum_TLS_Version = properties.minimumTlsVersion\r\n\r\n| join kind=inner (\r\n\tResourceContainers\r\n\t| where type =~ 'microsoft.resources/subscriptions/resourcegroups'\r\n\t| extend\r\n\t\tResource_Group = id\r\n\t| project subscriptionId, resourceGroup,Resource_Group)\r\non subscriptionId, resourceGroup\r\n| join kind=inner (\r\n\tSecurityResources\r\n    | where type == 'microsoft.security/assessments'\r\n    | where properties.displayName == 'Microsoft Defender for Storage should be enabled'\r\n    | extend \r\n        subscriptionId = substring(properties.resourceDetails.Id, 15),\r\n        Defender_Status = properties.status.code\r\n    | project subscriptionId,Defender_Status)\r\non subscriptionId\r\n| project Resource_name,Anonymous_Access,Internet_Access,HTTPS_Only,Minimum_TLS_Version,Defender_Status,type,Resource_Group,Subscription,Network_Policy",
+              "query": "Resources\r\n| where type =~ 'microsoft.storage/storageaccounts'\r\n| extend\r\n\tResource_name = id,\r\n    accessTier = coalesce(properties.accessTier,'Cool','Hot'),\r\n\tHTTPS_Only = properties.supportsHttpsTrafficOnly,\r\n\tAnonymous_Access = properties.allowBlobPublicAccess,\r\n    CrossTenantReplication = coalesce(properties.allowCrossTenantReplication,'false'),\r\n    LocalUserEnabled =  coalesce(properties.isLocalUserEnabled, 'no'),\r\n    SftpEnabled = coalesce(properties.isSftpEnabled, 'no'),\r\n\tInternet_Access = properties.networkAcls.defaultAction,\r\n\tNetwork_Policy = properties.networkAcls.ipRules,\r\n    Subscription = subscriptionId,\r\n    Minimum_TLS_Version = properties.minimumTlsVersion\r\n\r\n| join kind=inner (\r\n\tResourceContainers\r\n\t| where type =~ 'microsoft.resources/subscriptions/resourcegroups'\r\n\t| extend\r\n\t\tResource_Group = id\r\n\t| project subscriptionId, resourceGroup,Resource_Group)\r\non subscriptionId, resourceGroup\r\n| join kind=inner (\r\n\tSecurityResources\r\n    | where type == 'microsoft.security/assessments'\r\n    | where properties.displayName == 'Microsoft Defender for Storage should be enabled'\r\n    | extend \r\n        subscriptionId = substring(properties.resourceDetails.Id, 15),\r\n        Defender_Status = properties.status.code\r\n    | project subscriptionId,Defender_Status)\r\non subscriptionId\r\n| project Resource_name,accessTier,Anonymous_Access,CrossTenantReplication,LocalUserEnabled,SftpEnabled,Internet_Access,HTTPS_Only,Minimum_TLS_Version,Defender_Status,Network_Policy,Resource_Group,Subscription",
               "size": 0,
               "title": "Storage Accounts | Security Configuration |",
               "showRefreshButton": true,
@@ -810,6 +810,13 @@
                       "bladeOpenContext": {
                         "bladeParameters": []
                       }
+                    }
+                  },
+                  {
+                    "columnMatch": "accessTier",
+                    "formatter": 0,
+                    "tooltipFormat": {
+                      "tooltip": "Required for storage accounts where kind = BlobStorage. The access tier is used for billing. The 'Premium' access tier is the default value for premium block blobs storage account type and it cannot be changed for the premium block blobs storage account type.\t"
                     }
                   },
                   {
@@ -839,7 +846,79 @@
                       ]
                     },
                     "tooltipFormat": {
-                      "tooltip": "Storage Account -> Settings -> Configuration -> Allow Blob Public Access -> Disabled"
+                      "tooltip": "Allow or disallow public access to all blobs or containers in the storage account. The default interpretation is true for this property.\t"
+                    }
+                  },
+                  {
+                    "columnMatch": "CrossTenantReplication",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "true",
+                          "representation": "2",
+                          "text": "True"
+                        },
+                        {
+                          "operator": "==",
+                          "thresholdValue": "false",
+                          "representation": "success",
+                          "text": "False"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "1",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Allow or disallow cross AAD tenant object replication. The default interpretation is true for this property.\t"
+                    }
+                  },
+                  {
+                    "columnMatch": "LocalUserEnabled",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "==",
+                          "thresholdValue": "no",
+                          "representation": "1",
+                          "text": "No"
+                        },
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "{0}{1}"
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Enables local users feature, if set to true\t"
+                    }
+                  },
+                  {
+                    "columnMatch": "SftpEnabled",
+                    "formatter": 18,
+                    "formatOptions": {
+                      "thresholdsOptions": "icons",
+                      "thresholdsGrid": [
+                        {
+                          "operator": "Default",
+                          "thresholdValue": null,
+                          "representation": "success",
+                          "text": "No"
+                        }
+                      ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Enables Secure File Transfer Protocol, if set to true\t"
                     }
                   },
                   {
@@ -852,13 +931,13 @@
                           "operator": "==",
                           "thresholdValue": "Allow",
                           "representation": "4",
-                          "text": "Bad"
+                          "text": "Blocked"
                         },
                         {
                           "operator": "==",
                           "thresholdValue": "Deny",
                           "representation": "success",
-                          "text": "Good"
+                          "text": "Allowed"
                         },
                         {
                           "operator": "Default",
@@ -869,7 +948,7 @@
                       ]
                     },
                     "tooltipFormat": {
-                      "tooltip": "Storage Account -> Security & Networking -> Networking ->  Public network access -> Enabled from selected virtual networks and IP addresses OR Disabled"
+                      "tooltip": "Allow or disallow public access to all blobs or containers in the storage account. The default interpretation is true for this property.\t"
                     }
                   },
                   {
@@ -899,7 +978,7 @@
                       ]
                     },
                     "tooltipFormat": {
-                      "tooltip": "Storage Account -> Settings -> Configuration -> Secure transfer required -> Enabled"
+                      "tooltip": "Allows https traffic only to storage service if sets to true. The default value is true since API version 2019-04-01.\t"
                     }
                   },
                   {
@@ -912,25 +991,25 @@
                           "operator": "==",
                           "thresholdValue": "TLS1_2",
                           "representation": "success",
-                          "text": "{0}{1}"
+                          "text": "TLS 1.2"
                         },
                         {
                           "operator": "==",
                           "thresholdValue": "TLS1_1",
                           "representation": "4",
-                          "text": "{0}{1}"
+                          "text": "TLS 1.1"
                         },
                         {
                           "operator": "==",
                           "thresholdValue": "TLS1_0",
                           "representation": "4",
-                          "text": "{0}{1}"
+                          "text": "TLS 1.0"
                         },
                         {
                           "operator": "==",
                           "thresholdValue": "TLS1_3",
                           "representation": "success",
-                          "text": "{0}{1}"
+                          "text": "TLS 1.3"
                         },
                         {
                           "operator": "Default",
@@ -941,7 +1020,7 @@
                       ]
                     },
                     "tooltipFormat": {
-                      "tooltip": " torage Account -> Settings -> Configuration -> Minimum TLS Version -> TLS1.2"
+                      "tooltip": "Set the minimum TLS version to be permitted on requests to storage. The default interpretation is TLS 1.0 for this property.\t"
                     }
                   },
                   {
@@ -954,13 +1033,13 @@
                           "operator": "==",
                           "thresholdValue": "Healthy",
                           "representation": "success",
-                          "text": "{0}{1}"
+                          "text": "Enabled"
                         },
                         {
                           "operator": "==",
                           "thresholdValue": "Unhealthy",
                           "representation": "4",
-                          "text": "{0}{1}"
+                          "text": "Disabled"
                         },
                         {
                           "operator": "==",
@@ -975,13 +1054,16 @@
                           "text": "{0}{1}"
                         }
                       ]
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Defender for Storage status"
                     }
                   },
                   {
-                    "columnMatch": "type",
-                    "formatter": 16,
-                    "formatOptions": {
-                      "showIcon": true
+                    "columnMatch": "Network_Policy",
+                    "formatter": 0,
+                    "tooltipFormat": {
+                      "tooltip": "Network rule set"
                     }
                   },
                   {
@@ -990,6 +1072,9 @@
                     "formatOptions": {
                       "linkTarget": null,
                       "showIcon": true
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Name of the Resource Group that the Storage Account resides within"
                     }
                   },
                   {
@@ -998,6 +1083,26 @@
                     "formatOptions": {
                       "linkTarget": null,
                       "showIcon": true
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Name of the Subscription that the Storage Account resides within"
+                    }
+                  },
+                  {
+                    "columnMatch": "NfsV3Enabled",
+                    "formatter": 0,
+                    "tooltipFormat": {
+                      "tooltip": "NFS 3.0 protocol support enabled if set to true.\t"
+                    }
+                  },
+                  {
+                    "columnMatch": "type",
+                    "formatter": 16,
+                    "formatOptions": {
+                      "showIcon": true
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Is a Storage Acount"
                     }
                   }
                 ],
@@ -1008,8 +1113,25 @@
                     "label": "Resource Name"
                   },
                   {
+                    "columnId": "accessTier",
+                    "label": "Access Tier",
+                    "comment": ""
+                  },
+                  {
                     "columnId": "Anonymous_Access",
                     "label": "Anonymous Access"
+                  },
+                  {
+                    "columnId": "CrossTenantReplication",
+                    "label": "Cross Tenant Replication"
+                  },
+                  {
+                    "columnId": "LocalUserEnabled",
+                    "label": "Local User"
+                  },
+                  {
+                    "columnId": "SftpEnabled",
+                    "label": "SFTP Status"
                   },
                   {
                     "columnId": "Internet_Access",
@@ -1028,8 +1150,8 @@
                     "label": "Defender Status"
                   },
                   {
-                    "columnId": "type",
-                    "label": "Type"
+                    "columnId": "Network_Policy",
+                    "label": "Network Policy"
                   },
                   {
                     "columnId": "Resource_Group",
@@ -1038,10 +1160,6 @@
                   {
                     "columnId": "Subscription",
                     "label": "Subscription"
-                  },
-                  {
-                    "columnId": "Network_Policy",
-                    "label": "Network Policy"
                   }
                 ]
               },
