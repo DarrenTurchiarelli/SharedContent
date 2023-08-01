@@ -21,14 +21,14 @@ AzureDiagnostics
 #### Query only the deny logs in the last 24 hours.
 ```OQL
 AzureDiagnostics 
-| where TimeGenerated > ago(24h)
-  and Category == "AzureFirewallNetworkRule"
-  and msg_s contains "Deny" 
+|where TimeGenerated > ago(24h)
+ and Category == "AzureFirewallNetworkRule"
+ and msg_s contains "Deny" 
 ```
 #### Query denied traffic from a specific IP address.
 ```OQL
 AzureDiagnostics 
-| where ResourceType == "AZUREFIREWALLS"
-  and msg_s contains "request from <insert-ip-address>"
-  and msg_s contains "Deny"
+|where ResourceType == "AZUREFIREWALLS"
+ and msg_s contains "request from <insert-ip-address>"
+ and msg_s contains "Deny"
 ```
