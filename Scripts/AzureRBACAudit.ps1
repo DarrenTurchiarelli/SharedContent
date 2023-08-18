@@ -18,6 +18,7 @@ Creation date   : 18/08/2023
 Last Modified   : 18/08/2023
 
 #>
+
 # Update the output path to a valid location
 $OutputPath = "C:\Workbench\AzureRBAC.xlsx"
 
