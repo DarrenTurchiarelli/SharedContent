@@ -18,8 +18,8 @@ Creation date   : 18/08/2023
 Last Modified   : 18/08/2023
 
 #>
-
-$OutputPath = "C:\Workbench\AzureSubscriptionRBAC.xlsx"
+# Update the output path to a valid location
+$OutputPath = "C:\Workbench\AzureRBAC.xlsx"
 
 # Create a new Excel workbook
 $excel = New-Object -ComObject Excel.Application
