@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Export a list of all Azure policies and initiatives to a CSV file. 
+Export a list of all custom Azure policies
 
 .DESCRIPTION
-This script will export a list of all Azure policies in json format for auditing purposes.
+This script will export a list of all custom Azure policies in json format for auditing purposes.
 
 .INPUTS
 None
