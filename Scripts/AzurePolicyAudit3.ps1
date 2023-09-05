@@ -31,19 +31,20 @@ $results = @()
 # Get a list of JSON files in the folder
 $jsonFiles = Get-ChildItem -Path $folderPath -Filter "*.json"
 
-# Loop through each JSON file and extract properties.displayName and properties.description
+# Loop through each JSON file and extract properties.displayName, properties.description, and policy effect
 foreach ($jsonFile in $jsonFiles) {
     try {
         # Read the JSON content from the file
         $jsonContent = Get-Content -Path $jsonFile.FullName -Raw | ConvertFrom-Json
 
-        # Check if properties.displayName and properties.description exist
-        if ($jsonContent.Properties.DisplayName -and $jsonContent.Properties.Description) {
+        # Check if properties.displayName, properties.description, and effect exist
+        if ($jsonContent.Properties.DisplayName -and $jsonContent.Properties.Description -and $jsonContent.Properties.Parameters.effect) {
             # Create a custom object to store the result
             $result = [PSCustomObject]@{
                 File = $jsonFile.Name
                 DisplayName = $jsonContent.Properties.DisplayName
                 Description = $jsonContent.Properties.Description
+                Effect = $jsonContent.Properties.Parameters.effect.defaultValue
             }
 
             # Add the result to the array
