@@ -65,6 +65,7 @@ code --install-extension msazurermtools.azurerm-vscode-tools
 code --install-extension ms-mssql.mssql
 code --install-extension christian-kohler.path-intellisense
 code --install-extension esbenp.prettier-vscode
+code --install-extension postman.postman-for-vscode
 
 # Chocolatey
 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
