@@ -5,16 +5,22 @@ __version__ = "1.0.0"
 __maintainer__ = "Darren Turchiarelli"
 __email__      = "darren.turchiarelli@microsoft.com"
 __status__ = "Production"
-__summary__ = "This script is designed to fetch pricing data from the Microsoft Azure Retail Prices API (https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices)
-                  for virtual machines in the Australia East region. It processes the obtained data to organize the pricing information based on different term lengths—1 year, 3 years, and 5 years—for savings 
-                  plans associated with each virtual machine offering. The script extracts the unit and retail prices for each term length, and organizes this information alongside other relevant details
-                  about the virtual machine offerings into a structured format. Finally, the script outputs all this information to an Excel file for easy review and analysis. This allows users to have a 
-                  clear view of the pricing structure for virtual machines in the specified region, aiding in budgeting and decision-making."
+__summary__ = ("This script is designed to fetch pricing data from the Microsoft Azure Retail Prices API "
+              "(https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) "
+              "for virtual machines in the Australia East region. It processes the obtained data to organize the "
+              "pricing information based on different term lengths—1 year, 3 years, and 5 years—for savings "
+              "plans associated with each virtual machine offering. The script extracts the unit and retail prices "
+              "for each term length, and organizes this information alongside other relevant details "
+              "about the virtual machine offerings into a structured format. Finally, the script outputs all this "
+              "information to an Excel file for easy review and analysis. This allows users to have a "
+              "clear view of the pricing structure for virtual machines in the specified region, aiding in budgeting "
+              "and decision-making.")
 """
 
 import requests
 import pandas as pd
 import numpy as np
+import re  # Import the regex module
 
 # Define the URL and headers
 url = "https://prices.azure.com/api/retail/prices"
@@ -25,6 +31,16 @@ params = {
 
 # Send a GET request to the URL
 response = requests.get(url, params=params)
+
+# Function to format column names
+def format_column_name(column_name):
+    # Replace underscores with spaces
+    formatted_name = column_name.replace('_', ' ')
+    # Insert space before capital letters that are in the middle of the text
+    formatted_name = re.sub(r'(?<=[a-z])([A-Z])', r' \1', formatted_name)
+    # Capitalize each word
+    formatted_name = formatted_name.title()
+    return formatted_name
 
 # Check for a successful response (HTTP Status Code 200)
 if response.status_code == 200:
@@ -63,6 +79,9 @@ if response.status_code == 200:
     
     # Drop the original savingsPlan and reservationTerm columns (optional)
     df = df.drop(columns=['savingsPlan', 'reservationTerm'])
+    
+    # Update column headings
+    df.columns = df.columns.map(format_column_name)
     
     # Write the DataFrame to an Excel file
     df.to_excel('Azure_Pricing.xlsx', index=False)
