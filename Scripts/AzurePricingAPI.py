@@ -54,7 +54,7 @@ if response.status_code == 200:
     # Create a DataFrame from the items
     df = pd.DataFrame(items)
     
-    # Initialize new columns for the savings plans
+    # Initialize new columns
     for term in ['1_year', '3_year', '5_year']:
         df[f'{term}_term_unit_price'] = np.nan
         df[f'{term}_term_retail_price'] = np.nan
