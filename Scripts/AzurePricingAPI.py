@@ -25,8 +25,9 @@ import re  # Import the regex module
 # Define the URL and headers
 url = "https://prices.azure.com/api/retail/prices"
 params = {
-    'api-version': '2023-01-01-preview',
-    '$filter': "armRegionName eq 'australiaeast' and serviceName eq 'Virtual Machines'"
+    'api-version': '2023-01-01-preview', # Add the api-version parameter to the query which should make the script more future-proof
+    'currencyCode': 'AUD',  # Add the currencyCode parameter to the query based on your region
+    '$filter': "armRegionName eq 'australiaeast' and serviceName eq 'Virtual Machines'" # Update the query according to the region that you are interested in
 }
 
 # Send a GET request to the URL
