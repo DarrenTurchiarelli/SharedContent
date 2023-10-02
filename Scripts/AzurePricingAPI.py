@@ -1,20 +1,20 @@
 """
 __author__     = "Darren Turchiarelli"
-__license__    = "GPL"
-__version__    = "1.0.0"
+__license__ = "GPL"
+__version__ = "1.0.0"
 __maintainer__ = "Darren Turchiarelli"
 __email__      = "darren.turchiarelli@microsoft.com"
-__status__     = "Production"
-__summary__    = ("This script is designed to fetch pricing data from the Microsoft Azure Retail Prices API "
-                "(https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) "
-                "for virtual machines in the Australia East region. It processes the obtained data to organize the "
-                "pricing information based on different term lengths—1 year, 3 years, and 5 years—for savings "
-                "plans associated with each virtual machine offering. The script extracts the unit and retail prices "
-                "for each term length, and organizes this information alongside other relevant details "
-                "about the virtual machine offerings into a structured format. Finally, the script outputs all this "
-                "information to an Excel file for easy review and analysis. This allows users to have a "
-                "clear view of the pricing structure for virtual machines in the specified region, aiding in budgeting "
-                "and decision-making.")
+__status__ = "Production"
+__summary__ = ("This script is designed to fetch pricing data from the Microsoft Azure Retail Prices API "
+              "(https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) "
+              "for virtual machines in the Australia East region. It processes the obtained data to organize the "
+              "pricing information based on different term lengths—1 year, 3 years, and 5 years—for savings "
+              "plans associated with each virtual machine offering. The script extracts the unit and retail prices "
+              "for each term length, and organizes this information alongside other relevant details "
+              "about the virtual machine offerings into a structured format. Finally, the script outputs all this "
+              "information to an Excel file for easy review and analysis. This allows users to have a "
+              "clear view of the pricing structure for virtual machines in the specified region, aiding in budgeting "
+              "and decision-making.")
 """
 
 import requests
@@ -25,9 +25,9 @@ import re  # Import the regex module
 # Define the URL and headers
 url = "https://prices.azure.com/api/retail/prices"
 params = {
-    'api-version': '2023-01-01-preview', # Add the api-version parameter to the query which should make the script more future-proof
+    'api-version': '2023-01-01-preview',  # Add the api-version parameter to the query which should make the script more future-proof
     'currencyCode': 'AUD',  # Add the currencyCode parameter to the query based on your region
-    '$filter': "armRegionName eq 'australiaeast' and serviceName eq 'Virtual Machines'" # Update the query according to the region that you are interested in
+    '$filter': "armRegionName eq 'australiaeast' and serviceName eq 'Virtual Machines'"  # Update the query according to the region that you are interested in
 }
 
 # Send a GET request to the URL
@@ -54,13 +54,10 @@ if response.status_code == 200:
     # Create a DataFrame from the items
     df = pd.DataFrame(items)
     
-    # Initialize new columns
-    df['1_year_term_unit_price'] = np.nan   # Initialize 1-year term columns
-    df['1_year_term_retail_price'] = np.nan   # Initialize 1-year term columns
-    df['3_year_term_unit_price'] = np.nan   # Initialize 3-year term columns
-    df['3_year_term_retail_price'] = np.nan   # Initialize 3-year term columns
-    df['5_year_term_unit_price'] = np.nan   # Initialize 5-year term columns
-    df['5_year_term_retail_price'] = np.nan   # Initialize 5-year term columns
+    # Initialize new columns for the savings plans
+    for term in ['1_year', '3_year', '5_year']:
+        df[f'{term}_term_unit_price'] = np.nan
+        df[f'{term}_term_retail_price'] = np.nan
     
     # Loop through each row to extract savings plan details
     for index, row in df.iterrows():
