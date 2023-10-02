@@ -33,6 +33,9 @@ params = {
 # Send a GET request to the URL
 response = requests.get(url, params=params)
 
+# Check for a successful response (will raise HTTPError for bad responses)
+response.raise_for_status()
+
 # Function to format column names
 def format_column_name(column_name):
     # Replace underscores with spaces
@@ -43,45 +46,35 @@ def format_column_name(column_name):
     formatted_name = formatted_name.title()
     return formatted_name
 
-# Check for a successful response (HTTP Status Code 200)
-if response.status_code == 200:
-    # Parse the JSON response
-    data = response.json()
-    
-    # The relevant data is in a key named 'Items' in the JSON response
-    items = data.get('Items', [])
-    
-    # Create a DataFrame from the items
-    df = pd.DataFrame(items)
-    
-    # Initialize new columns
-    for term in ['1_year', '3_year', '5_year']:
-        df[f'{term}_term_unit_price'] = np.nan
-        df[f'{term}_term_retail_price'] = np.nan
-    
-    # Loop through each row to extract savings plan details
-    for index, row in df.iterrows():
-        savings_plan = row.get('savingsPlan', [])
-        if isinstance(savings_plan, list):  # Ensure savingsPlan is a list before iterating
-            for plan in savings_plan:
-                term = plan.get('term', '')
-                if term == '1 Year':
-                    df.at[index, '1_year_term_unit_price'] = plan.get('unitPrice', np.nan)
-                    df.at[index, '1_year_term_retail_price'] = plan.get('retailPrice', np.nan)
-                elif term == '3 Years':
-                    df.at[index, '3_year_term_unit_price'] = plan.get('unitPrice', np.nan)
-                    df.at[index, '3_year_term_retail_price'] = plan.get('retailPrice', np.nan)
-                elif term == '5 Years':  # Check for a 5-year term
-                    df.at[index, '5_year_term_unit_price'] = plan.get('unitPrice', np.nan)
-                    df.at[index, '5_year_term_retail_price'] = plan.get('retailPrice', np.nan)
-    
-    # Drop the original savingsPlan and reservationTerm columns (optional)
-    df = df.drop(columns=['savingsPlan', 'reservationTerm'])
-    
-    # Update column headings
-    df.columns = df.columns.map(format_column_name)
-    
-    # Write the DataFrame to an Excel file
-    df.to_excel('Azure_Pricing.xlsx', index=False)
-else:
-    print(f'Failed to retrieve data: {response.status_code}')
+# Parse the JSON response and create a DataFrame
+df = pd.DataFrame(response.json().get('Items', []))
+
+# Initialize new columns
+for term in ['1_year', '3_year', '5_year']:
+    df[f'{term}_term_unit_price'] = np.nan
+    df[f'{term}_term_retail_price'] = np.nan
+
+# Loop through each row to extract savings plan details
+for index, row in df.iterrows():
+    savings_plan = row.get('savingsPlan', [])
+    if isinstance(savings_plan, list):  # Ensure savingsPlan is a list before iterating
+        for plan in savings_plan:
+            term = plan.get('term', '')
+            if term == '1 Year':
+                df.at[index, '1_year_term_unit_price'] = plan.get('unitPrice', np.nan)
+                df.at[index, '1_year_term_retail_price'] = plan.get('retailPrice', np.nan)
+            elif term == '3 Years':
+                df.at[index, '3_year_term_unit_price'] = plan.get('unitPrice', np.nan)
+                df.at[index, '3_year_term_retail_price'] = plan.get('retailPrice', np.nan)
+            elif term == '5 Years':  # Check for a 5-year term
+                df.at[index, '5_year_term_unit_price'] = plan.get('unitPrice', np.nan)
+                df.at[index, '5_year_term_retail_price'] = plan.get('retailPrice', np.nan)
+
+# Drop the original savingsPlan and reservationTerm columns (optional)
+df = df.drop(columns=['savingsPlan', 'reservationTerm'])
+
+# Update column headings
+df.columns = df.columns.map(format_column_name)
+
+# Write the DataFrame to an Excel file
+df.to_excel('Azure_Pricing.xlsx', index=False)
