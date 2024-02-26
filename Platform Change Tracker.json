@@ -1,0 +1,358 @@
+{
+  "properties": {
+    "lenses": {
+      "0": {
+        "order": 0,
+        "parts": {
+          "0": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 21,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "Azure resources get changed through the course of daily use, reconfiguration, and even redeployment. Change can come from an individual or by an automated process, but while most change is by design, any change could cause crucial security, compliance, or operational issues. With the last 14 days of resource changes, the new Change History capability within the Azure Resource Graph API enables you to find when changes were detected on an Azure Resource Manager property as well as see what properties changed as part of that change event.\n\nFurther reading on creating shared dashboards can be found <a href='https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboard-share-access' target='https://learn.microsoft.com/en-us/azure/azure-portal/azure-portal-dashboard-share-access'>here</a>.\n",
+                  "title": "CompanyX > Platform Change Tracker",
+                  "subtitle": "Overview of resources deployed across your Azure tenancy.",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "1": {
+            "position": {
+              "x": 21,
+              "y": 0,
+              "colSpan": 2,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/HelpAndSupportPart"
+            }
+          },
+          "2": {
+            "position": {
+              "x": 0,
+              "y": 2,
+              "colSpan": 11,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "All Resource changes in the last 1 day ",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "ResourceChanges\r\n| join kind=inner\r\n   (resourcecontainers\r\n   | where type == 'microsoft.resources/subscriptions'\r\n   | project subscriptionId, subscriptionName = name)\r\n   on subscriptionId\r\n| extend changeTime = todatetime(properties.changeAttributes.timestamp), targetResourceId = tostring(properties.targetResourceId),\r\nchangeType = tostring(properties.changeType), correlationId = properties.changeAttributes.correlationId,\r\nchangedProperties = properties.changes, changeCount = properties.changeAttributes.changesCount\r\n| extend resourceName = tostring(split(targetResourceId, '/')[-1])\r\n| extend resourceType = tostring(split(targetResourceId, '/')[-2])\r\n// Change the time span as preferred, 1d(1 day/24h), 7d, 30d...\r\n| where changeTime > ago(1d)\r\n| where subscriptionName contains \"\" \r\n| order by changeType asc, changeTime desc\r\n| project ResourceName = resourceName, ResourceType = resourceType, Subscription = subscriptionName, ResourceGroup = resourceGroup, ChangeTime = changeTime,\r\nResource = targetResourceId, ChangeType = changeType,   ChangeCount = changeCount, Properties = changedProperties",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {}
+            }
+          },
+          "3": {
+            "position": {
+              "x": 11,
+              "y": 2,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Changes in virtual machine size ",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resourcechanges\r\n|extend vmSize = properties.changes[\"properties.hardwareProfile.vmSize\"], changeTime = todatetime(properties.changeAttributes.timestamp), targetResourceId = tostring(properties.targetResourceId), changeType = tostring(properties.changeType) \r\n| where isnotempty(vmSize) \r\n| order by changeTime desc \r\n| project changeTime, targetResourceId, changeType, properties.changes, previousSize = vmSize.previousValue, newSize = vmSize.newValue",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "236a9072-75aa-4ef9-9bf8-f3741bfc8d27",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {}
+            }
+          },
+          "4": {
+            "position": {
+              "x": 17,
+              "y": 2,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Resources deleted in a specific resource group",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resourcechanges\r\n| where resourceGroup == \"myResourceGroup\"\r\n| extend changeTime = todatetime(properties.changeAttributes.timestamp), targetResourceId = tostring(properties.targetResourceId),\r\nchangeType = tostring(properties.changeType), correlationId = properties.changeAttributes.correlationId\r\n| where changeType == \"Delete\"\r\n| order by changeTime desc\r\n| project changeTime, resourceGroup, targetResourceId, changeType, correlationId",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "d9aca72e-7fd6-4b05-9be1-fe6cbffebee5",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {}
+            }
+          },
+          "5": {
+            "position": {
+              "x": 0,
+              "y": 8,
+              "colSpan": 11,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query the latest resource configuration for resources created in the last seven days",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resourcechanges\r\n| extend targetResourceId = tostring(properties.targetResourceId), changeType = tostring(properties.changeType), changeTime = todatetime(properties.changeAttributes.timestamp)\r\n| where changeTime > ago(7d) and changeType == \"Create\"\r\n| project  targetResourceId, changeType, changeTime\r\n| join ( Resources | extend targetResourceId=id) on targetResourceId\r\n| order by changeTime desc\r\n| project changeTime, changeType, id, resourceGroup, type, properties",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "580eee8d-c935-42e5-a1c8-2aaf374c97b2",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {}
+            }
+          },
+          "6": {
+            "position": {
+              "x": 11,
+              "y": 8,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Count of changes by change type and subscription name",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resourcechanges  \r\n|extend changeType = tostring(properties.changeType), changeTime = todatetime(properties.changeAttributes.timestamp), targetResourceType=tostring(properties.targetResourceType)  \r\n| summarize count() by changeType, subscriptionId \r\n| join (resourcecontainers | where type=='microsoft.resources/subscriptions' | project SubscriptionName=name, subscriptionId) on subscriptionId \r\n| project-away subscriptionId, subscriptionId1\r\n| order by count_ desc",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "649f41c2-86df-4755-b05d-7d86d3d7f129",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {}
+            }
+          },
+          "7": {
+            "position": {
+              "x": 17,
+              "y": 8,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query the latest resource configuration for resources created with a certain tag",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resourcechanges \r\n|extend targetResourceId = tostring(properties.targetResourceId), changeType = tostring(properties.changeType), createTime = todatetime(properties.changeAttributes.timestamp) \r\n| where createTime > ago(7d) and changeType == \"Create\" or changeType == \"Update\" or changeType == \"Delete\"\r\n| project  targetResourceId, changeType, createTime \r\n| join ( Resources | extend targetResourceId=id) on targetResourceId\r\n| where tags ['ServiceOwner'] =~ 'CloudPlatformTeam' \r\n| order by createTime desc \r\n| project createTime, id, resourceGroup, type",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "/subscriptions/728f99b5-49fe-47b9-9bcd-97d981ccdfa9/resourceGroups/resource-graph-queries/providers/microsoft.resourcegraph/queries/Query the latest resource configuration for resources created with a certain tag",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {}
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        }
+      }
+    }
+  },
+  "name": "Platform Change Tracker",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Platform Change Tracker"
+  },
+  "apiVersion": "2015-08-01-preview"
+}
