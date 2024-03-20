@@ -19,4 +19,4 @@ resources
     )
     on ComputerName
 | where isnotempty(MMA)
-| project ComputerName, ResourceID = tolower(id), location, resourceGroup, OSType, PowerStatus, MMA, MMAStatus, version
+| project ["HostName"]=ComputerName, ResourceID = tolower(id), ["Location"]=location, ["ResourceGroup"]=resourceGroup, OSType, PowerStatus, MMA, MMAStatus, version
